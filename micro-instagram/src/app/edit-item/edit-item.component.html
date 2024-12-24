@@ -1,0 +1,57 @@
+<div class="container" style="min-height: 100vh;">
+    <div class="row justify-content-center">
+      <div class="col-md-6">
+        <div class="card">
+          <div class="card-header">
+            <h3>Upload New Photo</h3>
+          </div>
+          <div class="card-body">
+            <form class="row g-3" #form="ngForm" (ngSubmit)="onSubmit()">
+              <div class="mb-3">
+                <label for="currentPhoto" class="form-label">Current Photo</label>
+                <img 
+                  [src]="photo.thumbnailUrl" 
+                  alt="Current Photo" 
+                  class="img-thumbnail d-block" 
+                  style="max-width: 200px;">
+              </div>
+  
+              <div class="mb-3">
+                <label for="title" class="form-label">Title</label>
+                <input 
+                  type="text" 
+                  class="form-control" 
+                  id="title" 
+                  name="title" 
+                  [(ngModel)]="photo.title">
+              </div>
+  
+              <div class="mb-3">
+                <label for="photo" class="form-label">Upload New Photo</label>
+                <input 
+                  class="form-control" 
+                  type="file" 
+                  id="photo" 
+                  name="photo" 
+                  (change)="onFileSelected($event)">
+                
+                <div *ngIf="newPhotoUrl" class="mt-3">
+                  <p>Preview:</p>
+                  <img 
+                    [src]="newPhotoUrl" 
+                    alt="New Photo Preview" 
+                    class="img-thumbnail d-block" 
+                    style="max-width: 200px;">
+                </div>
+              </div>
+  
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary">Update Photo</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  

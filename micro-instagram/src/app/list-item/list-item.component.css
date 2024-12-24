@@ -1,0 +1,52 @@
+.container {
+    background-color: #f8f9fa;
+    padding-top: 20px;
+  }
+  
+  .card {
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
+  }
+  
+  .card:hover {
+    transform: scale(1.05);
+  }
+  
+  .card-body {
+    padding: 15px;
+  }
+  
+  .card-text {
+    font-size: 14px;
+    color: #333;
+  }
+  
+  img {
+    border-radius: 10px;
+  }
+  
+  button {
+    font-size: 1rem;
+    padding: 10px 20px;
+    margin: 0;
+  }
+  
+  .mat-paginator {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .mat-paginator .mat-button {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .mat-paginator .mat-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .row {
+    margin-bottom: 20px;
+  }
+  
