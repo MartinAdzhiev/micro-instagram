@@ -11,8 +11,9 @@ import { DeleteDialogComponent } from '../delete-dialog/delete-dialog.component'
 import { PhotoService } from '../../services/photo.service';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
+import { UntilDestroy } from '@ngneat/until-destroy';
 
-
+@UntilDestroy()
 @Component({
   selector: 'app-details',
   imports: [CommonModule, RouterModule, MatDialogModule, MatButtonModule],

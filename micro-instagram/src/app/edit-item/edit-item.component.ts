@@ -6,7 +6,9 @@ import { PhotoService } from '../../services/photo.service';
 import { ActivatedRoute } from '@angular/router';
 import { Router, RouterModule} from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
+import { UntilDestroy } from '@ngneat/until-destroy';
 
+@UntilDestroy()
 @Component({
   selector: 'app-edit-item',
   standalone: true,

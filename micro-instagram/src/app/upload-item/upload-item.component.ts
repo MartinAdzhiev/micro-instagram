@@ -7,7 +7,9 @@ import { AlbumService } from '../../services/album.service';
 import { Album } from '../../data/album';
 import { Photo } from '../../data/photo';
 import { ReactiveFormsModule } from '@angular/forms';
+import { UntilDestroy } from '@ngneat/until-destroy';
 
+@UntilDestroy()
 @Component({
   selector: 'app-upload-item',
   imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
