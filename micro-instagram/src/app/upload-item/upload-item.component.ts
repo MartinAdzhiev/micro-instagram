@@ -1,44 +1,46 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { PhotoService} from '../../services/photo.service';
 import { AlbumService } from '../../services/album.service';
 import { Album } from '../../data/album';
 import { Photo } from '../../data/photo';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-upload-item',
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule],
   templateUrl: './upload-item.component.html',
   styleUrl: './upload-item.component.css'
 })
-export class UploadItemComponent implements OnInit {
+export class UploadItemComponent {
 
-  albums: Album[] = []
-  selectedAlbumId!: Number;
-  title!: String;
+  albums$ = this.albumService.albums$;
   photoUrl!: String;
+
+
+  uploadForm = this.formBuilder.group({
+    albumId: ['', Validators.required],
+    title: ['', Validators.required],
+    photo: ['', Validators.required]
+  })
 
 
   constructor(private router: Router,
               private photoService: PhotoService,
-              private albumService: AlbumService){}
+              private albumService: AlbumService,
+              private formBuilder: FormBuilder){}
 
-  ngOnInit(): void {
-    this.loadAlbums();
-  }
-
-  loadAlbums(): void {
-    this.albumService.getAlbums().subscribe(response => {
-      this.albums = response;
-    })
-  }
 
   onSubmit() {
-    const photo: any = {
-        albumId: this.selectedAlbumId,
-        title: this.title,
+
+    if(this.uploadForm.valid) {
+      const formValues = this.uploadForm.value;
+
+      const photo: any = {
+        albumId: Number(formValues.albumId),
+        title: formValues.title,
         url: this.photoUrl,
         thumbnailUrl: this.photoUrl
         }
@@ -52,6 +54,7 @@ export class UploadItemComponent implements OnInit {
         console.error('Error uploading photo. Status:', err.status, 'Message:', err.message);
       }
     });;
+    }
   }
 
   onFileSelected(event: Event) {

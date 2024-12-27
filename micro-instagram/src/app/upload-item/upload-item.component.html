@@ -6,32 +6,41 @@
             <h3>Upload New Photo</h3>
           </div>
           <div class="card-body">
-            <form #form="ngForm" (ngSubmit)="onSubmit()">
+            <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
               <div class="mb-3">
                 <label for="album" class="form-label">Select Album</label>
-                <select id="album" class="form-select" [(ngModel)]="selectedAlbumId" name="albumId" required>
+                <select id="album" class="form-select" formControlName="albumId" [class.invalid]="uploadForm.get('albumId')?.invalid">
                   <option value="" disabled selected>Select an album</option>
-                  <option *ngFor="let album of albums" [value]="album.id">{{ album.title }}</option>
+                  <option *ngFor="let album of albums$ | async" [value]="album.id">{{ album.title }}</option>
                 </select>
+                <div *ngIf="uploadForm.get('albumId')?.invalid && uploadForm.get('albumId')?.touched" class="text-danger">
+                  Album is required.
+                </div>
               </div>
   
               <div class="mb-3">
                 <label for="title" class="form-label">Photo Title</label>
-                <input type="text" class="form-control" id="title" [(ngModel)]="title" name="title" required placeholder="Enter photo title">
+                <input type="text" class="form-control" id="title" formControlName="title" [class.invalid]="uploadForm.get('title')?.invalid" placeholder="Enter photo title">
+                <div *ngIf="uploadForm.get('title')?.invalid && uploadForm.get('title')?.touched" class="text-danger">
+                  Title is required.
+                </div>
               </div>
   
               <div class="mb-3">
                 <label for="photo" class="form-label">Upload Photo</label>
-                <input class="form-control" type="file" id="photo" (change)="onFileSelected($event)" required>
+                <input class="form-control" type="file" id="photo" formControlName="photo"  (change)="onFileSelected($event)" [class.invalid]="uploadForm.get('photo')?.invalid">
+                <div *ngIf="uploadForm.get('photo')?.invalid && uploadForm.get('photo')?.touched" class="text-danger">
+                  Photo is required.
+                </div>
               </div>
   
               <div class="text-center">
-                <button type="submit" class="btn btn-primary">Upload Photo</button>
+                <button type="submit" class="btn btn-primary" [disabled]="uploadForm.invalid">Upload Photo</button>
               </div>
             </form>
-            <pre>{{ selectedAlbumId }}</pre>
+            <!-- <pre>{{ selectedAlbumId }}</pre>
             <pre>{{ title }}</pre>
-            <pre>{{ photoUrl }}</pre>
+            <pre>{{ photoUrl }}</pre> -->
           </div>
         </div>
       </div>
