@@ -29,9 +29,6 @@
               <div class="mb-3">
                 <label for="photo" class="form-label">Upload Photo</label>
                 <input class="form-control" type="file" id="photo" formControlName="photo"  (change)="onFileSelected($event)" [class.invalid]="uploadForm.get('photo')?.invalid">
-                <div *ngIf="uploadForm.get('photo')?.invalid && uploadForm.get('photo')?.touched" class="text-danger">
-                  Photo is required.
-                </div>
               </div>
   
               <div class="text-center">
