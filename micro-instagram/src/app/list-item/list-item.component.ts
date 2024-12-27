@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PhotoService } from '../../services/photo.service';
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, combineLatest, map, Observable, of, tap } from 'rxjs';
 import { Photo } from '../../data/photo';
 import { Router, RouterModule } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
@@ -14,37 +14,51 @@ import { PageEvent } from '@angular/material/paginator';
   templateUrl: './list-item.component.html',
   styleUrls: ['./list-item.component.css']
 })
-export class ListItemComponent implements OnInit {
+export class ListItemComponent implements OnInit{
+ 
+  photos: Photo[] = [];
 
-  allPhotos: Photo[] = []; 
-  photos: Photo[] = [];  
-  totalPhotos: number = 0;  
-  pageSize: number = 12;  
-  currentPage: number = 0; 
+  pageSize: number = 12;
+
+  private currentPageSubject = new BehaviorSubject<number>(0);
+  currentPageAction$ = this.currentPageSubject.asObservable();
+
+  photos$: Observable<Photo[]> = this.photoService.photos$;
+  
+  totalPhotos$ = this.photoService.totalPhotos$.pipe(
+    tap(total => {
+      console.log('total photos:', total);
+    })
+  )
 
   constructor(private photoService: PhotoService, private router: Router) {}
 
-  ngOnInit(): void {
-    this.loadPhotos();
-  }
 
-  loadPhotos(): void {
-    this.photoService.getPhotos().subscribe(response => {
-      this.allPhotos = response;
-      this.totalPhotos = this.allPhotos.length;
-      this.paginatePhotos();
+  ngOnInit(): void {
+    this.getPaginatedPhotos().subscribe(paginatedPhotos => {
+      console.log('Received Paginated Photos:', paginatedPhotos);
+      this.photos = paginatedPhotos;
     });
   }
 
   onPageChange(event: PageEvent): void {
-    this.pageSize = event.pageSize;
-    this.currentPage = event.pageIndex;
-    this.paginatePhotos();
+    this.currentPageSubject.next(event.pageIndex);
   }
 
-  paginatePhotos(): void {
-    const startIndex = this.currentPage * this.pageSize;
-    const endIndex = startIndex + this.pageSize;
-    this.photos = this.allPhotos.slice(startIndex, endIndex);
-  }
+
+  getPaginatedPhotos(): Observable<Photo[]> {
+    return combineLatest([
+      this.photos$,
+      this.currentPageAction$
+    ]).pipe(
+      map(([photos, pageIndex]) => {
+        const startIndex = pageIndex * this.pageSize;
+        const endIndex = startIndex + this.pageSize;
+        return photos.slice(startIndex, endIndex);
+      }),
+      tap((paginatedPhotos) => {
+        console.log('Paginated Photos:', paginatedPhotos);
+      })
+    );
+}
 }
