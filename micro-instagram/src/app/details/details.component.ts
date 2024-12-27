@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Photo } from '../../data/photo';
 import { AlbumService } from '../../services/album.service';
 import { Album } from '../../data/album';
-import { Observable } from 'rxjs';
+import { Observable, of, switchMap } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import {MatDialogModule, MatDialog, MAT_DIALOG_DATA,} from '@angular/material/dialog';
 import {MatButtonModule} from '@angular/material/button';
@@ -37,32 +37,39 @@ export class DetailsComponent implements OnInit {
   }
 
   loadPhoto(): void {
-    this.photoService.getPhoto(this.photoId).subscribe(photo => {
-      this.photo = photo;
-
-      this.albumService.getAlbum(this.photo.albumId).subscribe(album => {
-        this.album = album;
+    this.photoService.getPhoto(this.photoId).pipe(
+      switchMap(photo => {
+        this.photo = photo;
+        return this.albumService.getAlbum(photo.albumId);
       })
+    ).subscribe(album => {
+      this.album = album;
     });
   }
 
   openDeleteDialog() {
-    let dialogRef = this.dialog.open(DeleteDialogComponent, {data: {id: this.photo.id}});
-    dialogRef.afterClosed().subscribe(result => {
-      if(result === true) {
-        this.photoService.deletePhoto(this.photo.id).subscribe({
-          next: (response) => {
-            console.log('Delete successful. Status:', response);
-            this.router.navigate(['/photos']);
-          },
-          error: (err) => {
-            console.error('Error deleting photo. Status:', err.status, 'Message:', err.message);
-          }
-        });;
+    const dialogRef = this.dialog.open(DeleteDialogComponent, {data: {id: this.photo.id}});
+    
+    dialogRef.afterClosed().pipe(
+      switchMap(result => {
+        if (result === true) {
+          return this.photoService.deletePhoto(this.photo.id);
+        } else {
+          return of(null);
+        }
+      })
+    ).subscribe({
+      next: (response) => {
+        if (response) {
+          console.log('Delete successful. Status:', response);
+          this.router.navigate(['/photos']);
+        }
+      },
+      error: (err) => {
+        console.error('Error deleting photo. Status:', err.status, 'Message:', err.message);
       }
-    })
+    });
   }
-
   openEdit(): void {
     this.router.navigate(['/edit', this.photoId]);
   }
