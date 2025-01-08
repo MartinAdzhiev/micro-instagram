@@ -8,6 +8,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatOptionModule } from '@angular/material/core';
 import { PageEvent } from '@angular/material/paginator';
 
 @Component({
@@ -27,6 +28,12 @@ export class ListItemComponent implements OnInit{
 
   private currentPageSizeSubject = new BehaviorSubject<number>(12);
   currentPageSizeAction$ = this.currentPageSizeSubject.asObservable();
+
+  private searchTitleSubject = new BehaviorSubject<string>('');
+  currentSearchTitle$ = this.searchTitleSubject.asObservable();
+
+  private sortSubject = new BehaviorSubject<boolean>(false);
+  currentSort$ = this.sortSubject.asObservable();
 
   photos$: Observable<Photo[]> = this.photoService.photos$;
   
@@ -51,14 +58,29 @@ export class ListItemComponent implements OnInit{
     this.currentPageSizeSubject.next(event.pageSize);
   }
 
+  onSearchTermChange(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    console.log(inputElement.value);
+    this.searchTitleSubject.next(inputElement.value)
+    this.currentPageSubject.next(0);
+  }
+
+  onSortChange(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    const isChecked = inputElement.checked; 
+    this.sortSubject.next(isChecked);
+  }
+
 
   getPaginatedPhotos(): Observable<Photo[]> {
     return combineLatest([
       this.currentPageAction$,
-      this.currentPageSizeAction$
+      this.currentPageSizeAction$,
+      this.currentSearchTitle$,
+      this.currentSort$
     ]).pipe(
-      switchMap(([pageIndex, pageSize]) => {
-        return this.photoService.getPaginatedPhotos(pageIndex + 1, pageSize)
+      switchMap(([pageIndex, pageSize, searchTitle, sort]) => {
+        return this.photoService.getPaginatedPhotos(pageIndex + 1, pageSize, searchTitle, sort)
       }),
       tap((paginatedPhotos) => {
         console.log('Paginated Photos:', paginatedPhotos);

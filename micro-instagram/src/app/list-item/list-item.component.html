@@ -7,8 +7,29 @@
     </div>
   </div>
 
-  <div class="row justify-content-center"
-  *ngIf="photos">
+  <div class="row justify-content-between mb-3">
+    <div class="col-md-6">
+      <div class="form-group">
+        <label for="searchTitle">Search by Title</label>
+        <input type="text" class="form-control" id="searchTitle" placeholder="Search photos..." (input)="onSearchTermChange($event)">
+      </div>
+    </div>
+
+    <div class="col-md-3 d-flex align-items-center">
+      <div class="form-group">
+        <label for="sortOrder">Sort By Title (Ascending)</label>
+        <input 
+          type="checkbox" 
+          id="sort" 
+          (change)="onSortChange($event)"
+          [checked]="currentSort$ | async"
+          class="ml-2"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center" *ngIf="photos">
     <div class="col-md-4 mb-4" *ngFor="let photo of photos">
       <div class="card shadow-sm">
         <a [routerLink]="['/details', photo.id]" class="text-decoration-none">
@@ -20,13 +41,15 @@
       </div>
     </div>
   </div>
-</div>
-<div class="row justify-content-center mb-3">
-  <mat-paginator [length]="totalPhotos$ | async" 
-                 [pageSize]="currentPageSizeAction$ | async" 
-                 [pageSizeOptions]="pageSizeOptions"
-                 [pageIndex]="currentPageAction$ | async" 
-                 [showFirstLastButtons]="true"
-                 (page)="onPageChange($event)">
-  </mat-paginator>
+
+  <div class="row justify-content-center mb-3">
+    <mat-paginator 
+      [length]="totalPhotos$ | async" 
+      [pageSize]="currentPageSizeAction$ | async" 
+      [pageSizeOptions]="pageSizeOptions"
+      [pageIndex]="currentPageAction$ | async" 
+      [showFirstLastButtons]="true"
+      (page)="onPageChange($event)">
+    </mat-paginator>
+  </div>
 </div>

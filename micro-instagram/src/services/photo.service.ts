@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { environment } from '../environments/environment';
 import { Photo } from '../data/photo';
@@ -19,8 +19,21 @@ export class PhotoService {
     map(photos => photos.length)
   )
 
-  getPaginatedPhotos(page: number, limit: number): Observable<Photo[]> {
-    return this.http.get<Photo[]>(`${this.baseUrl}?_page=${page}&_limit=${limit}`);
+  getPaginatedPhotos(page: number, limit: number, title: string, sort: boolean): Observable<Photo[]> {
+    let params = new HttpParams()
+    .set('_page', page.toString())
+    .set('_limit', limit.toString())
+
+    if(title) {
+      params = params.set('title_like', title)
+    }
+
+    if(sort) {
+      params = params.set('_sort', 'title')
+    }
+    console.log(params.toString());
+
+    return this.http.get<Photo[]>(this.baseUrl, { params });
   }
 
   getPhoto(id: Number): Observable<Photo> {
