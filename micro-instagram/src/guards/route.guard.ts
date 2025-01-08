@@ -14,10 +14,9 @@ export const routeGuard: CanActivateFn = (
 
         return photoService.getPhoto(Number(id)).pipe(
             map(photo => {
-              // If photo exists, return true, otherwise false
-              return !!photo;  // Ensures photo is truthy, meaning it exists
+              return !!photo;
             }),
-            catchError(() => of(false))  // If there's an error, return false (photo not found)
+            catchError(() => of(false))
           );
     }
   

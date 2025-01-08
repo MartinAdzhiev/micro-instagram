@@ -19,6 +19,10 @@ export class PhotoService {
     map(photos => photos.length)
   )
 
+  getPaginatedPhotos(page: number, limit: number): Observable<Photo[]> {
+    return this.http.get<Photo[]>(`${this.baseUrl}?_page=${page}&_limit=${limit}`);
+  }
+
   getPhoto(id: Number): Observable<Photo> {
     return this.http.get<Photo>(`${this.baseUrl}/${id}`);
   }

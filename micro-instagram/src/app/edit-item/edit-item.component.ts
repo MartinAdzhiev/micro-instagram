@@ -76,7 +76,6 @@ export class EditItemComponent implements OnInit {
         thumbnailUrl: this.updatedPhotoUrl
       }
 
-      console.log(updatedPhoto);
 
       this.photoService.updatePhoto(updatedPhoto).subscribe({
         next: (response) => {
