@@ -10,5 +10,6 @@ export const routes: Routes = [
     {path: 'photos', component: ListItemComponent},
     {path: 'details/:id', component: DetailsComponent, canActivate:[routeGuard]},
     {path: 'edit/:id', component: EditItemComponent, canActivate: [routeGuard]},
-    {path: 'upload', component: UploadItemComponent}
+    {path: 'upload', component: UploadItemComponent},
+    {path: '**' , component : ListItemComponent},
 ];
