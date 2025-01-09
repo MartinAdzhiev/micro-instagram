@@ -8,6 +8,7 @@ import { Album } from '../../data/album';
 import { Photo } from '../../data/photo';
 import { ReactiveFormsModule } from '@angular/forms';
 import { UntilDestroy } from '@ngneat/until-destroy';
+import { ErrorHandlingService } from '../../services/error-handling.service';
 
 @UntilDestroy()
 @Component({
@@ -32,7 +33,8 @@ export class UploadItemComponent {
   constructor(private router: Router,
               private photoService: PhotoService,
               private albumService: AlbumService,
-              private formBuilder: FormBuilder){}
+              private formBuilder: FormBuilder,
+              private errorHandlingService: ErrorHandlingService){}
 
 
   onSubmit() {
@@ -54,6 +56,7 @@ export class UploadItemComponent {
       },
       error: (err) => {
         console.error('Error uploading photo. Status:', err.status, 'Message:', err.message);
+        this.errorHandlingService.handleError(err, "Failed uploading photo");
       }
     });;
     }

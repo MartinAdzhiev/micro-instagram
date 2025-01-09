@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Router, RouterModule} from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
 import { UntilDestroy } from '@ngneat/until-destroy';
+import { ErrorHandlingService } from '../../services/error-handling.service';
 
 @UntilDestroy()
 @Component({
@@ -30,7 +31,8 @@ export class EditItemComponent implements OnInit {
   constructor(private photoService: PhotoService,
               private router: Router,
               private route: ActivatedRoute,
-              private formBuilder: FormBuilder) {}
+              private formBuilder: FormBuilder,
+              private errorHandlingService: ErrorHandlingService) {}
 
   ngOnInit(): void {
     this.photoId = +this.route.snapshot.paramMap.get('id')!;
@@ -84,6 +86,7 @@ export class EditItemComponent implements OnInit {
         },
         error: (err) => {
           console.error('Error updating photo. Status:', err.status, 'Message:', err.message);
+          this.errorHandlingService.handleError(err, "Failed to update photo");
         }
       });;
 

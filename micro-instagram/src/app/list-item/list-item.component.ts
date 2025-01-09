@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PhotoService } from '../../services/photo.service';
-import { BehaviorSubject, combineLatest, map, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, combineLatest, map, Observable, of, switchMap, tap } from 'rxjs';
 import { Photo } from '../../data/photo';
 import { Router, RouterModule } from '@angular/router';
 import { MatPaginator } from '@angular/material/paginator';
@@ -10,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatOptionModule } from '@angular/material/core';
 import { PageEvent } from '@angular/material/paginator';
+import { ErrorHandlingService } from '../../services/error-handling.service';
 
 @Component({
   selector: 'app-list-item',
@@ -43,7 +44,7 @@ export class ListItemComponent implements OnInit{
     })
   )
 
-  constructor(private photoService: PhotoService, private router: Router) {}
+  constructor(private photoService: PhotoService, private router: Router, private errorHandlingService: ErrorHandlingService) {}
 
 
   ngOnInit(): void {
@@ -80,7 +81,12 @@ export class ListItemComponent implements OnInit{
       this.currentSort$
     ]).pipe(
       switchMap(([pageIndex, pageSize, searchTitle, sort]) => {
-        return this.photoService.getPaginatedPhotos(pageIndex + 1, pageSize, searchTitle, sort)
+        return this.photoService.getPaginatedPhotos(pageIndex + 1, pageSize, searchTitle, sort).pipe(
+          catchError(error => {
+            this.errorHandlingService.handleError(error, "Failed to load photos");
+            return of([]);
+          })
+        )
       }),
       tap((paginatedPhotos) => {
         console.log('Paginated Photos:', paginatedPhotos);

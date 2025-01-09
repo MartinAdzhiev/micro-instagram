@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Photo } from '../../data/photo';
 import { AlbumService } from '../../services/album.service';
 import { Album } from '../../data/album';
-import { Observable, of, switchMap } from 'rxjs';
+import { catchError, Observable, of, switchMap } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import {MatDialogModule, MatDialog, MAT_DIALOG_DATA,} from '@angular/material/dialog';
 import {MatButtonModule} from '@angular/material/button';
@@ -12,6 +12,7 @@ import { PhotoService } from '../../services/photo.service';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
 import { UntilDestroy } from '@ngneat/until-destroy';
+import { ErrorHandlingService } from '../../services/error-handling.service';
 
 @UntilDestroy()
 @Component({
@@ -30,7 +31,8 @@ export class DetailsComponent implements OnInit {
               private photoService: PhotoService, 
               private dialog: MatDialog,
               private router: Router,
-              private route: ActivatedRoute) {}
+              private route: ActivatedRoute,
+              private errorHandlingService: ErrorHandlingService) {}
 
   ngOnInit(): void {
     this.photoId = +this.route.snapshot.paramMap.get('id')!;
@@ -42,9 +44,15 @@ export class DetailsComponent implements OnInit {
       switchMap(photo => {
         this.photo = photo;
         return this.albumService.getAlbum(photo.albumId);
+      }),
+      catchError(err => {
+        this.errorHandlingService.handleError(err, "Failed retrieving photo");
+        return of(null);
       })
     ).subscribe(album => {
-      this.album = album;
+      if(album){
+        this.album = album;
+      }
     });
   }
 
@@ -68,6 +76,7 @@ export class DetailsComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error deleting photo. Status:', err.status, 'Message:', err.message);
+        this.errorHandlingService.handleError(err, "Failed deleting photo");
       }
     });
   }
